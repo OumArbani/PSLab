@@ -130,3 +130,10 @@
     visibility: hidden;
     z-index: 10;
 }
+
+.hint-icon {
+    --slds-c-icon-color-default: #9bb1f5;
+}
+.hint-icon:hover {
+    filter: drop-shadow(0 0 3px #0070d2);
+}

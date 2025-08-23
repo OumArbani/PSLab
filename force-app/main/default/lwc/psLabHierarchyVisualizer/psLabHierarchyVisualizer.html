@@ -5,46 +5,56 @@
             <div class="settings-container">
                 <div class={settingsSectionClass}>
                     <div class="settings-area">
-                        <c-ps-lab-detector-filter ondetection={handleDetection} onfilterreset={handleFilterReset} onclearcontext={handleClearContext}></c-ps-lab-detector-filter>
+                        <c-ps-lab-detector-filter onclearcontext={handleClearContext} ondetection={handleDetection}
+                            onfilterreset={handleFilterReset}></c-ps-lab-detector-filter>
                     </div>
                 </div>
 
                 <div class="toggle-panel" onclick={toggleSettings} title="Toggle Settings Panel">
-                    <lightning-button-icon
-                            alternative-text="Toggle Settings"
-                            class="toggle-button slds-button_icon-bare"
-                            icon-name={toggleIcon}
-                            variant="bare"
-                            size="medium">
+                    <lightning-button-icon alternative-text="Toggle Settings"
+                        class="toggle-button slds-button_icon-bare" icon-name={toggleIcon} size="medium" variant="bare">
                     </lightning-button-icon>
                 </div>
             </div>
 
             <div class="tree-area slds-p-top_small">
-                <div class="slds-m-bottom_small slds-p-horizontal_small">
-                    <lightning-button
-                            disabled={isLoading}
-                            label={toggleButtonLabel}
-                            onclick={handleToggleExpansion}
-                            title={toggleButtonLabel}>
+                <div class="slds-grid slds-grid_align-spread slds-p-horizontal_small">
+                    <lightning-button disabled={isLoading} label={toggleButtonLabel} onclick={handleToggleExpansion}
+                        title={toggleButtonLabel}>
                     </lightning-button>
+
+                    <div class="slds-text-color_weak slds-text-body_small">
+                        <div class="slds-grid slds-grid_vertical">
+                            <span class="slds-text-color_weak slds-text-body_small">
+                                <lightning-icon class="hint-icon slds-m-right_x-small" icon-name="utility:light_bulb"
+                                    size="small"></lightning-icon>
+
+                                <strong>Hint:</strong> Right-click a PSG to open its setup page.
+                            </span>
+                            <span class="slds-text-color_weak slds-text-body_small">
+                                Left-click a PS to open its setup page.
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div class="tree-container slds-is-relative">
                     <div class="d3-tooltip tooltip-container"></div>
-                    <div if:true={showScrollButton} class="scroll-top-button-container">
-                        <lightning-button-icon
-                                class="slds-button_brand"
-                                alternative-text="Scroll to Top"
-                                icon-name="utility:chevronup"
-                                onclick={handleScrollToTop}
-                                title="Scroll to Top"
-                                variant="brand">
+                    <div class="scroll-top-button-container" if:true={showScrollButton}>
+                        <lightning-button-icon alternative-text="Scroll to Top" class="slds-button_brand"
+                            icon-name="utility:chevronup" onclick={handleScrollToTop} title="Scroll to Top"
+                            variant="brand">
                         </lightning-button-icon>
                     </div>
 
-                    <lightning-spinner if:true={isLoading} alternative-text="Loading..." size="medium"></lightning-spinner>
+                    <lightning-spinner alternative-text="Loading..." if:true={isLoading}
+                        size="medium"></lightning-spinner>
                 </div>
             </div>
+        </div>
+        <div class="slds-text-align_center slds-p-vertical_small slds-border_top">
+            <span class="slds-text-body_small slds-text-color_weak">
+                Made with ❤️ by Oumaima Arbani
+            </span>
         </div>
     </div>
 </template>
