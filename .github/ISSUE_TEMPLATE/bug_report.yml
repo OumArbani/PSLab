@@ -1,0 +1,60 @@
+name: Bug Report
+description: Report a bug or issue with PSLab
+title: "[Bug] A brief, descriptive title"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please search existing issues to see if your bug has already been reported.
+
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue already exists for the bug you encountered.
+      options:
+        - label: I have searched the existing issues
+          required: true
+
+  - type: dropdown
+    attributes:
+      label: What Salesforce environment are you using?
+      description: What type of org did this bug occur in?
+      options:
+        - Production
+        - Sandbox
+        - Scratch Org
+        - Developer Edition
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: Clear and concise steps to reproduce the behavior.
+      placeholder: |
+        1. Go to the 'Permissions Analyser' tab.
+        2. In the 'Permission to check' dropdown, select 'Object Permissions'.
+        3. In the 'Object' dropdown, select 'Account'.
+        4. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: A concise description of what is actually happening.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A concise description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here. You can paste screenshots by dragging them into this window.
