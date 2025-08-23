@@ -64,7 +64,8 @@ public without sharing class PSLab_PermissionSetExporterHelper{
                 'ApexClass'               => new ApexClassProvider(),
                 'ApexPage'                => new ApexPageProvider(),
                 'CustomPermission'        => new CustomPermissionProvider(),
-                'PermissionSetTabSetting' => new TabSettingProvider()
+                'PermissionSetTabSetting' => new TabSettingProvider(),
+                'PermissionSet'           => new SystemPermissionProvider()
         };
 
         List<String> rows = new List<String>();
@@ -179,10 +180,6 @@ public without sharing class PSLab_PermissionSetExporterHelper{
             Set<Id> entityIds = getEntityIdsByPermissionSetId(permissionSetId, 'CustomEntityDefinition');
             if (entityIds.isEmpty()) return rows;
 
-            System.debug([SELECT DeveloperName
-            FROM EntityDefinition
-            WHERE DurableId IN :entityIds AND QualifiedApiName LIKE '%__mdt']);
-
             for (EntityDefinition customMetadataType : [
                     SELECT DeveloperName
                     FROM EntityDefinition
@@ -253,6 +250,37 @@ public without sharing class PSLab_PermissionSetExporterHelper{
             ]) {
                 rows.add('Tab,' + tab.Name + ',' + 'Visibility:' + tab.Visibility);
             }
+            return rows;
+        }
+    }
+
+    private class SystemPermissionProvider implements IPermissionCsvProvider {
+        public List<String> getCsvRows(Id permissionSetId) {
+            List<String> rows = new List<String>();
+            List<Object> allSystemPermissions = PSLab_PermissionAnalysisHelper.getSystemPermissions();
+            if (allSystemPermissions.isEmpty()) {
+                return rows;
+            }
+
+            List<String> permissionApiNames = new List<String>();
+            for (Object permObject : allSystemPermissions) {
+                Map<String, Object> permMap = (Map<String, Object>) permObject;
+                permissionApiNames.add((String) permMap.get('value'));
+            }
+            String query = 'SELECT ' + String.join(permissionApiNames, ',') + ' FROM PermissionSet WHERE Id = :permissionSetId WITH SYSTEM_MODE';
+            PermissionSet permissionSet = Database.query(query);
+
+            for (Object permObject : allSystemPermissions) {
+                Map<String, Object> permMap = (Map<String, Object>) permObject;
+                String apiName = (String) permMap.get('value');
+                String label = (String) permMap.get('label');
+
+                if (permissionSet.get(apiName) == true) {
+                    String permissionName = label + ' (' + apiName + ')';
+                    rows.add('System Permission,' + permissionName + ',Enabled');
+                }
+            }
+            rows.sort();
             return rows;
         }
     }

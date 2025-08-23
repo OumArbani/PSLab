@@ -98,8 +98,6 @@ export class PermissionHierarchyFilter {
             const detectedInfo = this.findPermission(detectedPermissions, ps.permissionSetId);
 
             if (ps.permissionSetId.startsWith('0PS') && detectedInfo && (!detectedInfo.includedIn || detectedInfo.includedIn.length === 0)) {
-                console.log(ps.permissionSetId + ' starts with 0PS: '+ps.permissionSetId.startsWith('0PS'));
-                console.log(JSON.stringify(ps));
                 filteredStandaloneSets.push(deepClone(ps));
                 highlightedIds.add(ps.permissionSetId);
             }

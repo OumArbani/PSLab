@@ -84,6 +84,7 @@ export default class PsLabDetectorFilter extends LightningElement {
       Array.isArray(this.selectedMetadataOptions) &&
       this.securityOptions.length
     ) {
+      const isSingleOption = this.securityOptions.length === 1;
       return {
         label:
           this.permissionOptions.find(
@@ -95,7 +96,8 @@ export default class PsLabDetectorFilter extends LightningElement {
         isCustomCombobox: false,
         isCheckboxGroup: true,
         options: this.securityOptions,
-        disabled: this.noFieldsAvailable
+        disabled: this.noFieldsAvailable || isSingleOption,
+        initialValue: isSingleOption ? [this.securityOptions[0].value] : []
       };
     }
     return {};

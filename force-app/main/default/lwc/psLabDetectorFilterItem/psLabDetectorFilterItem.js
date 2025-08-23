@@ -17,6 +17,14 @@ export default class PsLabDetectorFilterItem extends LightningElement {
   @api
   set filterItemData(filterItemData) {
     this._filterItemData = filterItemData;
+    if (filterItemData?.initialValue) {
+      this.selectedOptions = filterItemData.initialValue;
+      this.dispatchEvent(
+          new CustomEvent("selectionchange", {
+            detail: { values: this.selectedOptions }
+          })
+      );
+    }
   }
 
   get label() {

@@ -549,7 +549,7 @@ public without sharing class PSLab_PermissionAnalysisHelper {
      * @author        Oumaima Arbani | 2025-08-22
      * @return        List<Object> A list of maps, each representing a System Permission.
      **/
-    private static List<Object> getSystemPermissions() {
+    public static List<Object> getSystemPermissions() {
         List<Object> systemPermissionsList = new List<Object>();
         List<PSLab_SP__mdt> systemPermissionsMetaData = [
                 SELECT SystemPermissionAPIName__c, SystemPermissionLabel__c
@@ -859,32 +859,75 @@ public without sharing class PSLab_PermissionAnalysisHelper {
             when 'ApexClass', 'ApexPage', 'CustomPermission' {
                 String nameFieldToFilterOn = (selectedPermission == 'CustomPermission') ? 'DeveloperName' : 'Name';
 
-                query =
-                        'SELECT Id, ' +
-                        nameFieldToFilterOn +
-                        ', (SELECT Id, ParentId, Parent.Name, Parent.Label FROM SetupEntityAccessItems ' +
-                        'WHERE Parent.Type != \'Profile\' ' +
-                        buildPermissionQueryClause(permissionsAPINamesObject, permissionType) +
-                        ') FROM ' +
-                        selectedPermission;
+                if(condition.equalsIgnoreCase('OR')){
+                    query =
+                            'SELECT Id, ' +
+                            nameFieldToFilterOn +
+                            ', (SELECT Id, ParentId, Parent.Name, Parent.Label FROM SetupEntityAccessItems ' +
+                            'WHERE Parent.Type != \'Profile\' ' +
+                            buildPermissionQueryClause(permissionsAPINamesObject, permissionType) +
+                            ') FROM ' +
+                            selectedPermission;
 
-                if (String.isNotBlank(metadataAPIName)) {
-                    query += ' WHERE ' + nameFieldToFilterOn + ' IN (' + toInClause(metadataAPIName) + ')';
+                    if (String.isNotBlank(metadataAPIName)) {
+                        query += ' WHERE ' + nameFieldToFilterOn + ' IN (' + toInClause(metadataAPIName) + ')';
+                    }
+                }else if(condition.equalsIgnoreCase('AND')){
+                    Integer metadataCount = 0;
+                    if (String.isNotBlank(metadataAPIName)) {
+                        metadataCount = metadataAPIName.split(',').size();
+                    }
+                    query =
+                            'SELECT ParentId, Parent.Name, Parent.Label ' +
+                            'FROM SetupEntityAccess ' +
+                            'WHERE SetupEntityType = \'' + String.escapeSingleQuotes(selectedPermission) + '\' ' +
+                            'AND Parent.IsOwnedByProfile = false ' +
+                            buildPermissionQueryClause(permissionsAPINamesObject, permissionType) +
+                            'AND SetupEntityId IN (' +
+                            '  SELECT Id FROM ' + selectedPermission + ' ' +
+                            '  WHERE ' + nameFieldToFilterOn + ' IN (' + toInClause(metadataAPIName) + ')' +
+                            ') ' +
+                            'GROUP BY ParentId, Parent.Name, Parent.Label ' +
+                            'HAVING COUNT(Id) = ' + metadataCount;
                 }
             }
             when 'PermissionSetTabSetting' {
-                String visibility = String.valueOf(permissions.equals('DefaultOn') ? permissions : 'DefaultOff');
-                query = 'SELECT Id, ParentId, Parent.Name, Parent.Type, Parent.Label,  Name, Visibility FROM PermissionSetTabSetting';
-                if (String.isNotBlank(metadataAPIName)) {
-                    query +=
-                            ' WHERE Parent.Type != \'Profile\' AND Name IN (' +
-                            toInClause(metadataAPIName) +
-                            ') AND Visibility = \'' +
-                            visibility +
-                            '\'';
+                if (String.isBlank(metadataAPIName)) {
+                    query = null;
+                    return '';
                 }
 
-                query += buildPermissionQueryClause(permissionsAPINamesObject, permissionType);
+                String visibility = permissions.equals('DefaultOn') ? 'DefaultOn' : 'DefaultOff';
+                List<String> whereClauses = new List<String>{
+                        'Parent.IsOwnedByProfile = false',
+                        'Name IN (' + toInClause(metadataAPIName) + ')',
+                        'Visibility = \'' + String.escapeSingleQuotes(visibility) + '\''
+                };
+
+                String permSetClause = buildPermissionQueryClause(permissionsAPINamesObject, permissionType);
+                if (String.isNotBlank(permSetClause)) {
+                    String trimmedClause = permSetClause.trim();
+                    if (trimmedClause.toUpperCase().startsWith('AND ')) {
+                        whereClauses.add(trimmedClause.substring(4));
+                    } else {
+                        whereClauses.add(trimmedClause);
+                    }
+                }
+
+                String finalWhereClause = ' WHERE ' + String.join(whereClauses, ' AND ');
+
+                if (condition.equalsIgnoreCase('AND')) {
+                    Integer metadataCount = metadataAPIName.split(',').size();
+                    query = 'SELECT ParentId, Parent.Name, Parent.Label ' +
+                            'FROM PermissionSetTabSetting ' +
+                            finalWhereClause +
+                            ' GROUP BY ParentId, Parent.Name, Parent.Label ' +
+                            'HAVING COUNT(Id) = ' + metadataCount;
+                } else {
+                    query = 'SELECT Id, ParentId, Parent.Name, Parent.Label, Name, Visibility ' +
+                            'FROM PermissionSetTabSetting ' +
+                            finalWhereClause;
+                }
             }
             when 'TabSet', 'FlowDefinition', 'CustomMetadataType', 'CustomSetting' {
                 if (selectedPermission.equals('CustomMetadataType') || selectedPermission.equals('CustomSetting')) {

@@ -695,7 +695,8 @@ private class PSLab_PermissionAnalysisHelperTest {
                 'permission' => 'ApexClass',
                 'permissionType' => 'PS',
                 'permissionsAPINames' => ps.Name,
-                'metadataNames' => 'PSLab_PermissionAnalysisHelper'
+                'metadataNames' => 'PSLab_PermissionAnalysisHelper',
+                'condition' => 'OR'
         };
         List<PSLab_DetectedPermission> results;
         System.runAs(psLabUser) {
@@ -746,7 +747,8 @@ private class PSLab_PermissionAnalysisHelperTest {
                 'permissionType' => 'PS',
                 'permissionsAPINames' => ps.Name,
                 'metadataNames' => 'Account',
-                'securityPermissions' => 'Visible'
+                'securityPermissions' => 'Visible',
+                'condition' => 'OR'
         };
         List<PSLab_DetectedPermission> results;
         System.runAs(psLabUser) {
