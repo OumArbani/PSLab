@@ -26,7 +26,7 @@ To get started with the code, you'll need to set up a local development environm
 2. Then, clone your forked repository to your local machine:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/pslab.git
+git clone https://github.com/OumArbani/PSLab.git
 cd pslab
 ```
 
@@ -44,7 +44,7 @@ sf org login web --alias pslab-dev
 sf org create scratch --definition-file config/project-scratch-def.json --alias pslab-scratch --set-default
 ```
 ### Deploy the Source Code
-Push the entire project to your development org:
+Push the entire project to your development org
 
 ### Assign Permissions
 Assign the **`PSLabUser`** permission set to your user to ensure you have access to all components:
@@ -72,6 +72,6 @@ Please refer to this [document](/STYLE_GUIDE.md)
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by our Code of Conduct. By participating, you are expected to uphold this code.
+This project and everyone participating in it is governed by our [Code of Conduct](/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
 Looking forward to your contributions!

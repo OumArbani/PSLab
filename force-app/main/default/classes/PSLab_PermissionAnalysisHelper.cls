@@ -165,7 +165,7 @@ public without sharing class PSLab_PermissionAnalysisHelper {
      **/
     private static String executeToolingApiQuery(String soqlQuery) {
         HttpRequest req = new HttpRequest();
-        String endpoint = 'callout:Tooling_API_Credential/services/data/v64.0/tooling/query/?q=';
+        String endpoint = 'callout:Tooling_API_Credentials/services/data/v64.0/tooling/query/?q=';
         endpoint += EncodingUtil.urlEncode(soqlQuery, 'UTF-8');
         req.setEndpoint(endpoint);
         req.setMethod('GET');

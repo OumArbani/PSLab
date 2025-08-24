@@ -97,7 +97,7 @@ export default class PsLabDetectorFilter extends LightningElement {
         isCheckboxGroup: true,
         options: this.securityOptions,
         disabled: this.noFieldsAvailable || isSingleOption,
-        initialValue: isSingleOption ? [this.securityOptions[0].value] : []
+        initialValue: isSingleOption  ? [this.securityOptions[0].value] : []
       };
     }
     return {};

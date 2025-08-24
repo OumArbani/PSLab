@@ -35,7 +35,7 @@ const FLS_OPTIONS = [
   { label: "Edit", value: "PermissionsEdit" }
 ];
 
-const TABS_OPTIONS = [{ label: "Default On", value: "DefaultOn", checked: true }];
+const TABS_OPTIONS = [{ label: "Default On", value: "DefaultOn" }];
 
 const FILTER_OPTIONS = [
   { label: "All Conditions Are Met", value: "AND" },
