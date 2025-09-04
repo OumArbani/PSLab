@@ -14,7 +14,7 @@ public without sharing class PSLab_PermissionSetExporterHelper{
 
         List<PermissionSetInfo> results = new List<PermissionSetInfo>();
 
-        List<PermissionSet> rawPermissionSets = [
+        for(PermissionSet permissionSet : [
                 SELECT Id, Name, Label, Description, Type, IsCustom,
                         CreatedBy.Name, CreatedDate, LastModifiedBy.Name, LastModifiedDate,
                 (SELECT PermissionSetGroup.DeveloperName FROM PermissionSetGroupComponents)
@@ -22,9 +22,7 @@ public without sharing class PSLab_PermissionSetExporterHelper{
                 WHERE Type IN ('Regular', 'Standard', 'Session')
                 WITH SYSTEM_MODE
                 ORDER BY Label ASC
-        ];
-
-        for(PermissionSet permissionSet : rawPermissionSets){
+        ]){
             PermissionSetInfo info = new PermissionSetInfo();
             info.Id = permissionSet.Id;
             info.label = permissionSet.Label + ' (' + permissionSet.Name + ')';
