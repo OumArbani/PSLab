@@ -14,15 +14,34 @@ public without sharing class PSLab_PermissionSetExporterHelper{
 
         List<PermissionSetInfo> results = new List<PermissionSetInfo>();
 
-        for(PermissionSet permissionSet : [
+        List<PermissionSet> rawPermissionSets = [
                 SELECT Id, Name, Label, Description, Type, IsCustom,
-                        CreatedBy.Name, CreatedDate, LastModifiedBy.Name, LastModifiedDate,
-                (SELECT PermissionSetGroup.DeveloperName FROM PermissionSetGroupComponents)
+                        CreatedBy.Name, CreatedDate, LastModifiedBy.Name, LastModifiedDate
                 FROM PermissionSet
                 WHERE Type IN ('Regular', 'Standard', 'Session')
                 WITH SYSTEM_MODE
                 ORDER BY Label ASC
-        ]){
+        ];
+
+        if (rawPermissionSets.isEmpty()) {
+            return new List<PermissionSetInfo>();
+        }
+
+        Map<Id, PermissionSet> permissionSetsById = new Map<Id, PermissionSet>(rawPermissionSets);
+        Map<Id, List<String>> groupNamesByPermissionSetId = new Map<Id, List<String>>();
+        for (PermissionSetGroupComponent psgComponent : [
+                SELECT PermissionSetId, PermissionSetGroup.DeveloperName
+                FROM PermissionSetGroupComponent
+                WHERE PermissionSetId IN :permissionSetsById.keySet()
+        ]) {
+            if (!groupNamesByPermissionSetId.containsKey(psgComponent.PermissionSetId)) {
+                groupNamesByPermissionSetId.put(psgComponent.PermissionSetId, new List<String>());
+            }
+            groupNamesByPermissionSetId.get(psgComponent.PermissionSetId).add(psgComponent.PermissionSetGroup.DeveloperName);
+        }
+
+
+        for(PermissionSet permissionSet : rawPermissionSets){
             PermissionSetInfo info = new PermissionSetInfo();
             info.Id = permissionSet.Id;
             info.label = permissionSet.Label + ' (' + permissionSet.Name + ')';
@@ -36,13 +55,12 @@ public without sharing class PSLab_PermissionSetExporterHelper{
             info.type = permissionSet.Type;
             info.assignedUsersURL = setupDomain + '/lightning/setup/PermSets/' + permissionSet.Id + '/PermissionSetAssignment/home';
 
-            List<String> groupNames = new List<String>();
-            if (permissionSet.PermissionSetGroupComponents != null) {
-                for (PermissionSetGroupComponent permissionSetGroupComponent : permissionSet.PermissionSetGroupComponents) {
-                    groupNames.add(permissionSetGroupComponent.PermissionSetGroup.DeveloperName);
-                }
+            List<String> groupNames = groupNamesByPermissionSetId.get(permissionSet.Id);
+            if (groupNames != null && !groupNames.isEmpty()) {
+                info.includedIn = String.join(groupNames, ', ');
+            } else {
+                info.includedIn = '';
             }
-            info.includedIn = String.join(groupNames, ', ');
 
             results.add(info);
         }
