@@ -10,12 +10,15 @@ import { permissionDetectorFilterSettings } from "c/psLabCoreUtils";
 
 import getPermissionsOrUsersList from "@salesforce/apex/PSLab_PermissionAnalysisController.getPermissionsOrUsersList";
 
+import searchUsers from "@salesforce/apex/PSLab_PermissionAnalysisController.searchUsers";
+
 import getPermissionSetHierarchyByUserId from "@salesforce/apex/PSLab_PermissionAnalysisController.getPermissionSetHierarchyByUserId";
 
 import getOptionsBySelectedPermission from "@salesforce/apex/PSLab_PermissionAnalysisController.getOptionsBySelectedPermission";
 
 import getDetectedPermissions from "@salesforce/apex/PSLab_PermissionAnalysisController.getDetectedPermissions";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+const SEARCH_DELAY = 350;
 
 export default class PsLabDetectorFilter extends LightningElement {
   filterSettings = permissionDetectorFilterSettings;
@@ -207,6 +210,9 @@ export default class PsLabDetectorFilter extends LightningElement {
     }
   }
 
+  get isUserSearchMode() {
+    return this.selectedPermissionTypeOption === 'User';
+  }
 
 
   connectedCallback() {
@@ -219,6 +225,33 @@ export default class PsLabDetectorFilter extends LightningElement {
     const clearContextEvent = new CustomEvent("clearcontext");
     this.dispatchEvent(clearContextEvent);
     this.getPermissionsOrUsersList();
+  }
+
+  handleUserSearch(event) {
+    const searchTerm = event.detail.value;
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+
+    this.searchTimeout = setTimeout(() => {
+      if (searchTerm && searchTerm.length >= 2) {
+        this.showSpinner = true;
+        searchUsers({ searchTerm: searchTerm })
+            .then(result => {
+              this.usersAndPermissionsOptions = result;
+            })
+            .catch(error => {
+              this.showToast('Error', 'User search failed.', 'error');
+              console.error('User search error:', error);
+              this.usersAndPermissionsOptions = [];
+            })
+            .finally(() => {
+              this.showSpinner = false;
+            });
+      } else {
+        this.usersAndPermissionsOptions = [];
+      }
+    }, SEARCH_DELAY);
   }
 
   handlePermissionOptionsChange(event) {

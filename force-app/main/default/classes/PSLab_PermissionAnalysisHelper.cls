@@ -241,6 +241,38 @@ public without sharing class PSLab_PermissionAnalysisHelper {
     }
 
     /**
+     * @description   Searches for active users by name or username.
+     * @author        Oumaima Arbani | 2025-09-04
+     * @param         searchTerm The string to search for.
+     * @return        List<Object> A list of maps representing matching users.
+     **/
+    public static List<Object> searchUsers(String searchTerm) {
+        String likeQuery = '%' + String.escapeSingleQuotes(searchTerm) + '%';
+        Integer queryLimit = 20; // Limit results to a reasonable number for UI display
+
+        List<User> usersList = [
+                SELECT Id, Name, Username
+                FROM User
+                WHERE (Name LIKE :likeQuery OR Username LIKE :likeQuery) AND IsActive = TRUE
+                WITH SYSTEM_MODE
+                ORDER BY Name ASC
+                LIMIT :queryLimit
+        ];
+
+        List<Object> users = new List<Object>();
+        for (User user : usersList) {
+            users.add(
+                    new Map<String, Object>{
+                            'Id' => user.Id,
+                            'label' => user.Name + ' (' + user.Username + ')',
+                            'value' => user.Id
+                    }
+            );
+        }
+        return users;
+    }
+
+    /**
      * @description   Retrieves all Users in the org and formats them for a UI dropdown.
      * @author        Oumaima Arbani | 2025-08-22
      * @return        List<Object> A list of maps, each representing a User.

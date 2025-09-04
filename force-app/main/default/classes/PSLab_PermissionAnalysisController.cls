@@ -12,6 +12,11 @@ public with sharing class PSLab_PermissionAnalysisController{
     }
 
     @AuraEnabled(Cacheable = true)
+    public static List<Object> searchUsers(String searchTerm) {
+        return PSLab_PermissionAnalysisHelper.searchUsers(searchTerm);
+    }
+
+    @AuraEnabled(Cacheable = true)
     public static PSLab_HierarchyNode getPermissionSetHierarchy() {
         return PSLab_PermissionAnalysisHelper.getPermissionSetHierarchy();
     }

@@ -21,6 +21,7 @@ export default class PsLabMultiSelectComboBox extends LightningElement {
   @api name = '';
   @api required = false;
   @api isMultiSelect;
+  @api isServerSearch = false;
 
   get options() {
     return this._options;
@@ -110,6 +111,12 @@ export default class PsLabMultiSelectComboBox extends LightningElement {
   handleInput(event) {
     this.searchTerm = event.target.value;
     this.showDropdown = true;
+
+    if (this.isServerSearch) {
+      this.dispatchEvent(new CustomEvent('search', {
+        detail: { value: this.searchTerm }
+      }));
+    }
   }
 
   openDropdown() {
